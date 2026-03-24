@@ -1,10 +1,19 @@
+import { useState } from 'react';
 import ParticleBackground from './components/ParticleBackground';
 import HeroSection from './components/HeroSection';
 import CardGrid from './components/CardGrid';
 import Footer from './components/Footer';
+import PhotoViewer from './components/PhotoViewer';
+import GalleryViewer from './components/GalleryViewer';
+import ClassDetails from './components/ClassDetails';
+import BackgroundMusic from './components/BackgroundMusic';
 import './index.css';
 
 function App() {
+  const [photoOpen, setPhotoOpen] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [classDetailsOpen, setClassDetailsOpen] = useState(false);
+
   return (
     <div className="relative min-h-screen" style={{ background: 'linear-gradient(135deg, #020010 0%, #0a0025 30%, #07001a 60%, #020010 100%)' }}>
       {/* Class group photo background */}
@@ -16,7 +25,7 @@ function App() {
           backgroundSize: 'cover',
           backgroundPosition: 'center top',
           backgroundRepeat: 'no-repeat',
-          opacity: 0.07,
+          opacity: 0.17,
           zIndex: 0,
           filter: 'blur(1px) saturate(0.6)',
         }}
@@ -65,9 +74,25 @@ function App() {
       {/* Main content */}
       <main className="relative">
         <HeroSection />
-        <CardGrid />
+        <CardGrid
+          onOpenPhoto={() => setPhotoOpen(true)}
+          onOpenGallery={() => setGalleryOpen(true)}
+          onOpenClassDetails={() => setClassDetailsOpen(true)}
+        />
         <Footer />
       </main>
+
+      {/* Photo lightbox */}
+      <PhotoViewer isOpen={photoOpen} onClose={() => setPhotoOpen(false)} />
+
+      {/* Gallery viewer */}
+      <GalleryViewer isOpen={galleryOpen} onClose={() => setGalleryOpen(false)} />
+
+      {/* Class details */}
+      <ClassDetails isOpen={classDetailsOpen} onClose={() => setClassDetailsOpen(false)} />
+
+      {/* Background music */}
+      <BackgroundMusic />
     </div>
   );
 }

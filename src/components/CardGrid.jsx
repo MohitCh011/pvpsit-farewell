@@ -22,39 +22,21 @@ const cards = [
     glow: 'rgba(59, 130, 246, 0.4)',
     accentColor: '#60a5fa',
     href: '#',
+    isGallery: true,
   },
+
+
   {
-    id: 'messages',
-    emoji: '💌',
-    title: 'Messages',
-    description: 'Heartfelt words from friends, faculty, and everyone who made this journey special.',
-    button: 'Read Messages',
-    gradient: 'from-pink-600/30 to-rose-800/20',
-    glow: 'rgba(236, 72, 153, 0.4)',
-    accentColor: '#f472b6',
-    href: '#',
-  },
-  {
-    id: 'playlist',
-    emoji: '🎧',
-    title: 'Playlist',
-    description: 'The songs that defined our late-night study sessions, trips, and celebrations.',
-    button: 'Listen Now',
-    gradient: 'from-emerald-600/30 to-teal-800/20',
-    glow: 'rgba(16, 185, 129, 0.4)',
-    accentColor: '#34d399',
-    href: '#',
-  },
-  {
-    id: 'yearbook',
-    emoji: '📜',
-    title: 'Yearbook',
-    description: 'Your digital yearbook — profiles, memories, and messages all in one place.',
-    button: 'Download',
+    id: 'class-details',
+    emoji: '📋',
+    title: 'Class Details',
+    description: 'The full CSE-1 roll — 71 batchmates who shared every lecture, lab, and memory.',
+    button: 'View Roll',
     gradient: 'from-amber-600/30 to-orange-800/20',
     glow: 'rgba(245, 158, 11, 0.4)',
     accentColor: '#fbbf24',
     href: '#',
+    isClassDetails: true,
   },
   {
     id: 'group-photo',
@@ -84,7 +66,7 @@ const cardVariants = {
   }),
 };
 
-const Card = ({ card, index }) => (
+const Card = ({ card, index, onOpenPhoto, onOpenGallery, onOpenClassDetails }) => (
   <motion.article
     id={card.id}
     custom={index}
@@ -117,33 +99,22 @@ const Card = ({ card, index }) => (
       </div>
     </div>
 
-    {/* Thumbnail preview for photo card */}
-    {card.isPhoto && (
-      <div className="rounded-xl overflow-hidden" style={{ height: '90px' }}>
-        <img
-          src={card.href}
-          alt="CSE Batch Group Photo"
-          className="w-full h-full object-cover object-top"
-          style={{ filter: 'brightness(0.85) saturate(0.9)' }}
-        />
-      </div>
-    )}
-
     {/* Description */}
     <p className="text-sm sm:text-base leading-relaxed flex-1" style={{ color: 'rgba(203, 213, 225, 0.75)' }}>
       {card.description}
     </p>
 
-    {/* Button */}
-    <motion.a
-      href={card.href}
-      target={card.isPhoto ? '_blank' : undefined}
-      rel={card.isPhoto ? 'noopener noreferrer' : undefined}
+    <motion.button
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.97 }}
       className="glow-btn relative z-10 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white select-none"
       aria-label={`${card.button} - ${card.title}`}
-      onClick={card.isPhoto ? undefined : (e) => e.preventDefault()}
+      onClick={
+        card.isPhoto ? onOpenPhoto
+          : card.isGallery ? onOpenGallery
+            : card.isClassDetails ? onOpenClassDetails
+              : undefined
+      }
     >
       <span className="relative z-10">{card.button}</span>
       <motion.span
@@ -153,12 +124,12 @@ const Card = ({ card, index }) => (
       >
         →
       </motion.span>
-    </motion.a>
+    </motion.button>
   </motion.article>
 );
 
-const CardGrid = () => (
-  <section className="relative z-10 px-4 sm:px-8 pb-24 max-w-6xl mx-auto">
+const CardGrid = ({ onOpenPhoto, onOpenGallery, onOpenClassDetails }) => (
+  <section className="relative z-10 px-4 sm:px-8 pb-24 max-w-3xl mx-auto">
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -168,13 +139,13 @@ const CardGrid = () => (
     >
       <h2 className="text-3xl sm:text-4xl font-bold gradient-text mb-3">Your Memory Capsule</h2>
       <p className="text-slate-400 text-base sm:text-lg max-w-xl mx-auto">
-        Four years compressed into six moments. Click to relive them.
+        Four years compressed into four moments. Click to relive them.
       </p>
     </motion.div>
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
       {cards.map((card, i) => (
-        <Card key={card.id} card={card} index={i} />
+        <Card key={card.id} card={card} index={i} onOpenPhoto={onOpenPhoto} onOpenGallery={onOpenGallery} onOpenClassDetails={onOpenClassDetails} />
       ))}
     </div>
   </section>
