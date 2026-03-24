@@ -7,6 +7,29 @@ import './index.css';
 function App() {
   return (
     <div className="relative min-h-screen" style={{ background: 'linear-gradient(135deg, #020010 0%, #0a0025 30%, #07001a 60%, #020010 100%)' }}>
+      {/* Class group photo background */}
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'url(/class-photo.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center top',
+          backgroundRepeat: 'no-repeat',
+          opacity: 0.07,
+          zIndex: 0,
+          filter: 'blur(1px) saturate(0.6)',
+        }}
+      />
+      {/* Dark gradient overlay to preserve readability */}
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(2,0,16,0.6) 0%, rgba(2,0,16,0.3) 40%, rgba(2,0,16,0.6) 100%)',
+          zIndex: 0,
+        }}
+      />
       {/* Ambient glow blobs */}
       <div
         aria-hidden="true"

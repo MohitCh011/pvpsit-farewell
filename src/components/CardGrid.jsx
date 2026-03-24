@@ -57,15 +57,16 @@ const cards = [
     href: '#',
   },
   {
-    id: 'fun-zone',
-    emoji: '😂',
-    title: 'Fun Zone',
-    description: 'The memes, bloopers, and totally unhinged moments we\'ll never forget.',
-    button: 'Explore',
+    id: 'group-photo',
+    emoji: '🤝',
+    title: 'Group Photo',
+    description: 'Our entire CSE batch, together in one frame — a moment frozen in time forever.',
+    button: 'View Photo',
     gradient: 'from-red-600/30 to-fuchsia-800/20',
     glow: 'rgba(239, 68, 68, 0.4)',
     accentColor: '#f87171',
-    href: '#',
+    href: '/class-photo.jpg',
+    isPhoto: true,
   },
 ];
 
@@ -116,6 +117,18 @@ const Card = ({ card, index }) => (
       </div>
     </div>
 
+    {/* Thumbnail preview for photo card */}
+    {card.isPhoto && (
+      <div className="rounded-xl overflow-hidden" style={{ height: '90px' }}>
+        <img
+          src={card.href}
+          alt="CSE Batch Group Photo"
+          className="w-full h-full object-cover object-top"
+          style={{ filter: 'brightness(0.85) saturate(0.9)' }}
+        />
+      </div>
+    )}
+
     {/* Description */}
     <p className="text-sm sm:text-base leading-relaxed flex-1" style={{ color: 'rgba(203, 213, 225, 0.75)' }}>
       {card.description}
@@ -124,11 +137,13 @@ const Card = ({ card, index }) => (
     {/* Button */}
     <motion.a
       href={card.href}
+      target={card.isPhoto ? '_blank' : undefined}
+      rel={card.isPhoto ? 'noopener noreferrer' : undefined}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.97 }}
       className="glow-btn relative z-10 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white select-none"
       aria-label={`${card.button} - ${card.title}`}
-      onClick={(e) => e.preventDefault()}
+      onClick={card.isPhoto ? undefined : (e) => e.preventDefault()}
     >
       <span className="relative z-10">{card.button}</span>
       <motion.span
