@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const STUDENTS = [
@@ -78,6 +78,8 @@ const STUDENTS = [
 
 const ClassDetails = ({ isOpen, onClose }) => {
   const [search, setSearch] = useState('');
+  const [showScroll, setShowScroll] = useState(false);
+  const scrollRef = useRef(null);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -174,7 +176,7 @@ const ClassDetails = ({ isOpen, onClose }) => {
           </motion.div>
 
           {/* TABLE */}
-          <div className="flex-1 overflow-y-auto px-3 py-3">
+          <div ref={scrollRef} onScroll={(e) => setShowScroll(e.target.scrollTop > 300)} className="flex-1 overflow-y-auto px-3 py-3 relative">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -237,6 +239,23 @@ const ClassDetails = ({ isOpen, onClose }) => {
               </div>
             </motion.div>
           </div>
+
+          {/* Local Scroll To Top for Class Details */}
+          <AnimatePresence>
+            {showScroll && (
+              <motion.button
+                key="class-scroll-top"
+                initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.8 }}
+                onClick={() => scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="absolute bottom-16 right-4 sm:bottom-20 sm:right-5 z-50 w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-white shadow-lg cursor-pointer"
+                style={{ background: 'linear-gradient(135deg, #7c3aed, #3b82f6)', border: '1px solid rgba(139,92,246,0.4)' }}
+              >
+                ↑
+              </motion.button>
+            )}
+          </AnimatePresence>
         </motion.div>
       )}
     </AnimatePresence>

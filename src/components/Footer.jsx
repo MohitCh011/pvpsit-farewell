@@ -6,7 +6,7 @@ const Footer = () => (
     whileInView={{ opacity: 1 }}
     viewport={{ once: true }}
     transition={{ duration: 1 }}
-    className="relative z-10 py-10 text-center px-4"
+    className="relative z-10 pt-10 pb-28 text-center px-4"
   >
     {/* Divider */}
     <div className="flex items-center justify-center gap-4 mb-6">

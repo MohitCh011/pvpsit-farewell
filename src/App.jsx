@@ -7,6 +7,7 @@ import PhotoViewer from './components/PhotoViewer';
 import GalleryViewer from './components/GalleryViewer';
 import ClassDetails from './components/ClassDetails';
 import BackgroundMusic from './components/BackgroundMusic';
+import ScrollToTop from './components/ScrollToTop';
 import './index.css';
 
 function App() {
@@ -91,7 +92,8 @@ function App() {
       {/* Class details */}
       <ClassDetails isOpen={classDetailsOpen} onClose={() => setClassDetailsOpen(false)} />
 
-      {/* Background music */}
+      {/* Floating features */}
+      <ScrollToTop />
       <BackgroundMusic />
     </div>
   );

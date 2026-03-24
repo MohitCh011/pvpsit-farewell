@@ -47,10 +47,10 @@ const HeroSection = () => {
         {/* Main title */}
         <motion.h1
           variants={itemVariants}
-          className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tight leading-none"
+          className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tight leading-none flex flex-wrap justify-center items-center gap-2 sm:gap-4"
         >
           <span className="gradient-text">CSE 2022–2026</span>
-          <span className="ml-3 text-5xl sm:text-6xl">🎓</span>
+          <span className="text-4xl sm:text-6xl -mt-1 sm:mt-0">🎓</span>
         </motion.h1>
 
         {/* Subtitle */}

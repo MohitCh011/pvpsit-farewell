@@ -70,7 +70,7 @@ const BackgroundMusic = () => {
       <audio ref={audioRef} src="/bg-music.mp3" preload="auto" />
 
       {/* Floating music button */}
-      <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2">
+      <div className="fixed bottom-4 right-4 sm:bottom-5 sm:right-5 z-50 flex flex-col items-end gap-2">
         {/* Hint bubble */}
         <AnimatePresence>
           {showHint && (
@@ -97,7 +97,7 @@ const BackgroundMusic = () => {
           whileHover={{ scale: 1.12 }}
           whileTap={{ scale: 0.92 }}
           aria-label={playing ? 'Pause music' : 'Play music'}
-          className="w-12 h-12 rounded-full flex items-center justify-center text-white relative"
+          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white relative shadow-lg"
           style={{
             background: playing
               ? 'linear-gradient(135deg, #7c3aed, #3b82f6)'
