@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BOYS_PHOTOS, GIRLS_PHOTOS, PASSWORD_HASHES } from '../galleryConfig';
+import { BOYS_VIDEOS, GIRLS_VIDEOS } from '../galleryVideosConfig';
 
 // SHA-256 hash helper using the browser's built-in Web Crypto API
 const sha256 = async (text) => {
@@ -8,10 +9,11 @@ const sha256 = async (text) => {
   return [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('');
 };
 
-// Stages: 'select' | 'password' | 'gallery'  (lightbox = gallery + lightboxIdx !== null)
+// Stages: 'select' | 'password' | 'mediaSelect' | 'gallery'  (lightbox = gallery + lightboxIdx !== null)
 const GalleryViewer = ({ isOpen, onClose }) => {
   const [stage, setStage] = useState('select');
   const [gender, setGender] = useState(null);
+  const [mediaType, setMediaType] = useState(null);
   const [pwd, setPwd] = useState('');
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState('');
@@ -21,8 +23,13 @@ const GalleryViewer = ({ isOpen, onClose }) => {
   const inputRef = useRef(null);
   const scrollRef = useRef(null);
 
-  const photos = gender === 'boys' ? BOYS_PHOTOS : GIRLS_PHOTOS;
-  const isEmpty = photos.length === 0;
+  const getMediaItems = () => {
+    if (gender === 'boys') return mediaType === 'videos' ? BOYS_VIDEOS : BOYS_PHOTOS;
+    if (gender === 'girls') return mediaType === 'videos' ? GIRLS_VIDEOS : GIRLS_PHOTOS;
+    return [];
+  };
+  const mediaItems = getMediaItems();
+  const isEmpty = mediaItems.length === 0;
 
   // Reset state when closed
   useEffect(() => {
@@ -30,6 +37,7 @@ const GalleryViewer = ({ isOpen, onClose }) => {
       setTimeout(() => {
         setStage('select');
         setGender(null);
+        setMediaType(null);
         setPwd('');
         setError('');
         setLightboxIdx(null);
@@ -60,11 +68,16 @@ const GalleryViewer = ({ isOpen, onClose }) => {
     setError('');
   };
 
+  const handleMediaTypeSelect = (type) => {
+    setMediaType(type);
+    setStage('gallery');
+  };
+
   const handleSubmit = async (e) => {
     e?.preventDefault();
     const inputHash = await sha256(pwd);
     if (inputHash === PASSWORD_HASHES[gender]) {
-      setStage('gallery');
+      setStage('mediaSelect');
       setError('');
     } else {
       setError('Wrong password. Try again.');
@@ -107,12 +120,13 @@ const GalleryViewer = ({ isOpen, onClose }) => {
                 if (lightboxIdx !== null) { setLightboxIdx(null); return; }
                 if (stage === 'select')   { onClose(); return; }
                 if (stage === 'password') { setStage('select'); return; }
-                if (stage === 'gallery')  { setStage('password'); setPwd(''); }
+                if (stage === 'mediaSelect') { setStage('password'); setPwd(''); return; }
+                if (stage === 'gallery')  { setStage('mediaSelect'); return; }
               }}
               className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-white"
               style={{ background: 'rgba(139,92,246,0.18)', border: '1px solid rgba(139,92,246,0.35)' }}
             >
-              ← {lightboxIdx !== null ? 'Gallery' : stage === 'gallery' ? 'Back' : stage === 'password' ? 'Choose' : 'Back'}
+              ← {lightboxIdx !== null ? 'Gallery' : stage === 'gallery' ? 'Back' : stage === 'mediaSelect' ? 'Back' : stage === 'password' ? 'Choose' : 'Back'}
             </motion.button>
 
             {/* Title */}
@@ -266,6 +280,49 @@ const GalleryViewer = ({ isOpen, onClose }) => {
                   </motion.div>
                 )}
 
+                {/* STAGE: MEDIA SELECT */}
+                {stage === 'mediaSelect' && (
+                  <motion.div
+                    key="mediaSelect"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.35 }}
+                    className="text-center w-full max-w-sm"
+                  >
+                    <motion.div
+                      className="text-5xl mb-4"
+                    >🗂️</motion.div>
+                    <h2 className="text-2xl font-black mb-2 text-white">
+                      What to view?
+                    </h2>
+                    <p className="text-slate-400 text-sm mb-8">Choose photos or videos from {genderConfig[gender].label}&apos;s Album</p>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <motion.button
+                        whileHover={{ scale: 1.05, y: -4 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => handleMediaTypeSelect('photos')}
+                        className={`flex flex-col items-center justify-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-indigo-600/30 to-purple-800/20`}
+                        style={{ border: `1px solid rgba(139,92,246,0.4)` }}
+                      >
+                        <span className="text-4xl">📸</span>
+                        <span className="text-white font-bold text-lg">Photos</span>
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.05, y: -4 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => handleMediaTypeSelect('videos')}
+                        className={`flex flex-col items-center justify-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-teal-600/30 to-emerald-800/20`}
+                        style={{ border: `1px solid rgba(16,185,129,0.4)` }}
+                      >
+                        <span className="text-4xl">🎥</span>
+                        <span className="text-white font-bold text-lg">Videos</span>
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                )}
+
                 {/* STAGE: GALLERY GRID */}
                 {stage === 'gallery' && lightboxIdx === null && (
                   <motion.div
@@ -281,21 +338,21 @@ const GalleryViewer = ({ isOpen, onClose }) => {
                         style={{ color: genderConfig[gender].color }}>
                         {genderConfig[gender].emoji} {genderConfig[gender].label}&apos;s Album
                       </h2>
-                      <p className="text-slate-400 text-sm mt-1">{isEmpty ? 'No photos yet' : `${photos.length} photos`}</p>
+                      <p className="text-slate-400 text-sm mt-1">{isEmpty ? `No ${mediaType} yet` : `${mediaItems.length} ${mediaType}`}</p>
                     </div>
 
                     {isEmpty ? (
                       <div className="flex flex-col items-center justify-center gap-4 py-16 text-slate-500">
                         <span className="text-5xl">🖼️</span>
                         <p className="text-sm text-center">
-                          No photos added yet.<br />
-                          Drop images in <code className="text-purple-400">public/gallery/{gender}/</code><br />
+                          No {mediaType} added yet.<br />
+                          Drop {mediaType} in <code className="text-purple-400">public/gallery/{gender}/</code><br />
                           and register them in <code className="text-purple-400">src/galleryConfig.js</code>
                         </p>
                       </div>
                     ) : (
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                        {photos.map((photo, i) => (
+                        {mediaItems.map((item, i) => (
                           <motion.button
                             key={i}
                             initial={{ opacity: 0, scale: 0.9 }}
@@ -307,16 +364,25 @@ const GalleryViewer = ({ isOpen, onClose }) => {
                             className="relative rounded-xl overflow-hidden aspect-square"
                             style={{ border: `1px solid ${genderConfig[gender].color}25` }}
                           >
-                            <img
-                              src={photo.src}
-                              alt={photo.caption || `Photo ${i + 1}`}
-                              className="w-full h-full object-cover"
-                              loading="lazy"
-                            />
-                            {photo.caption && (
+                            {mediaType === 'videos' ? (
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                <video src={item.src} className="w-full h-full object-cover opacity-80" preload="metadata" />
+                                <div className="absolute w-10 h-10 rounded-full bg-black/60 flex items-center justify-center text-white border border-white/30 pl-1 z-10 backdrop-blur-sm">
+                                  ▶
+                                </div>
+                              </div>
+                            ) : (
+                              <img
+                                src={item.src}
+                                alt={item.caption || `Photo ${i + 1}`}
+                                className="w-full h-full object-cover"
+                                loading="lazy"
+                              />
+                            )}
+                            {item.caption && (
                               <div className="absolute bottom-0 left-0 right-0 px-2 py-1 text-xs text-white text-center"
                                 style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)' }}>
-                                {photo.caption}
+                                {item.caption}
                               </div>
                             )}
                           </motion.button>
@@ -336,14 +402,24 @@ const GalleryViewer = ({ isOpen, onClose }) => {
                     transition={{ duration: 0.35 }}
                     className="flex flex-col items-center gap-3 w-full max-w-2xl"
                   >
-                    <img
-                      src={photos[lightboxIdx].src}
-                      alt={photos[lightboxIdx].caption || `Photo ${lightboxIdx + 1}`}
-                      className="max-w-full max-h-[72vh] object-contain rounded-xl"
-                      style={{ boxShadow: `0 0 60px ${genderConfig[gender].glow}` }}
-                    />
-                    {photos[lightboxIdx].caption && (
-                      <p className="text-slate-300 text-sm italic">{photos[lightboxIdx].caption}</p>
+                    {mediaType === 'videos' ? (
+                      <video
+                        src={mediaItems[lightboxIdx].src}
+                        controls
+                        autoPlay
+                        className="max-w-full max-h-[72vh] object-contain rounded-xl bg-black/50"
+                        style={{ boxShadow: `0 0 60px ${genderConfig[gender].glow}` }}
+                      />
+                    ) : (
+                      <img
+                        src={mediaItems[lightboxIdx].src}
+                        alt={mediaItems[lightboxIdx].caption || `Photo ${lightboxIdx + 1}`}
+                        className="max-w-full max-h-[72vh] object-contain rounded-xl"
+                        style={{ boxShadow: `0 0 60px ${genderConfig[gender].glow}` }}
+                      />
+                    )}
+                    {mediaItems[lightboxIdx].caption && (
+                      <p className="text-slate-300 text-sm italic">{mediaItems[lightboxIdx].caption}</p>
                     )}
                     <div className="flex gap-3 mt-1">
                       <motion.button
@@ -355,7 +431,7 @@ const GalleryViewer = ({ isOpen, onClose }) => {
                         style={{ background: 'rgba(139,92,246,0.2)', border: '1px solid rgba(139,92,246,0.35)' }}
                       >← Prev</motion.button>
                       <motion.button
-                        disabled={lightboxIdx === photos.length - 1}
+                        disabled={lightboxIdx === mediaItems.length - 1}
                         whileHover={{ scale: 1.08 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setLightboxIdx(i => i + 1)}
@@ -363,7 +439,7 @@ const GalleryViewer = ({ isOpen, onClose }) => {
                         style={{ background: 'rgba(139,92,246,0.2)', border: '1px solid rgba(139,92,246,0.35)' }}
                       >Next →</motion.button>
                     </div>
-                    <p className="text-slate-500 text-xs">{lightboxIdx + 1} / {photos.length}</p>
+                    <p className="text-slate-500 text-xs">{lightboxIdx + 1} / {mediaItems.length}</p>
                   </motion.div>
                 )}
 
