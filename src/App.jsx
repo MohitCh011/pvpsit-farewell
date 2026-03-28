@@ -70,7 +70,7 @@ function App() {
       />
 
       {/* Particle layer */}
-      <ParticleBackground />
+       <ParticleBackground />
 
       {/* Main content */}
       <main className="relative">
@@ -83,9 +83,9 @@ function App() {
         <Footer />
       </main>
 
-      {/* Photo lightbox */}
+      {/* Photo lightbox 
       <PhotoViewer isOpen={photoOpen} onClose={() => setPhotoOpen(false)} />
-
+*/}
       {/* Gallery viewer */}
       <GalleryViewer isOpen={galleryOpen} onClose={() => setGalleryOpen(false)} />
 
