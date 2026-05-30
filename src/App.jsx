@@ -8,6 +8,7 @@ import GalleryViewer from './components/GalleryViewer';
 import ClassDetails from './components/ClassDetails';
 import MemoryWall from './components/MemoryWall';
 import BatchStats from './components/BatchStats';
+import VideoPlayer from './components/VideoPlayer';
 import BackgroundMusic from './components/BackgroundMusic';
 import ScrollToTop from './components/ScrollToTop';
 import './index.css';
@@ -18,6 +19,7 @@ function App() {
   const [classDetailsOpen, setClassDetailsOpen] = useState(false);
   const [memoryWallOpen, setMemoryWallOpen] = useState(false);
   const [batchStatsOpen, setBatchStatsOpen] = useState(false);
+  const [videoOpen, setVideoOpen] = useState(false);
 
   return (
     <div className="relative min-h-screen" style={{ background: 'linear-gradient(135deg, #020010 0%, #0a0025 30%, #07001a 60%, #020010 100%)' }}>
@@ -85,6 +87,7 @@ function App() {
           onOpenClassDetails={() => setClassDetailsOpen(true)}
           onOpenMemoryWall={() => setMemoryWallOpen(true)}
           onOpenBatchStats={() => setBatchStatsOpen(true)}
+          onOpenVideo={() => setVideoOpen(true)}
         />
         <Footer />
       </main>
@@ -103,6 +106,9 @@ function App() {
 
       {/* Batch Stats dashboard */}
       <BatchStats isOpen={batchStatsOpen} onClose={() => setBatchStatsOpen(false)} />
+
+      {/* Memories Video Player Modal */}
+      <VideoPlayer isOpen={videoOpen} onClose={() => setVideoOpen(false)} />
 
       {/* Floating features */}
       <ScrollToTop />

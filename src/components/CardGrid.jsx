@@ -11,6 +11,7 @@ const cards = [
     glow: 'rgba(139, 92, 246, 0.4)',
     accentColor: '#c084fc',
     href: '#',
+    isMemoriesVideo: true,
   },
   {
     id: 'photo-gallery',
@@ -88,7 +89,7 @@ const cardVariants = {
   }),
 };
 
-const Card = ({ card, index, onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenMemoryWall, onOpenBatchStats }) => (
+const Card = ({ card, index, onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenMemoryWall, onOpenBatchStats, onOpenVideo }) => (
   <motion.article
     id={card.id}
     custom={index}
@@ -106,7 +107,8 @@ const Card = ({ card, index, onOpenPhoto, onOpenGallery, onOpenClassDetails, onO
           : card.isClassDetails ? onOpenClassDetails
             : card.isMemoryWall ? onOpenMemoryWall
               : card.isBatchStats ? onOpenBatchStats
-                : undefined
+                : card.isMemoriesVideo ? onOpenVideo
+                  : undefined
     }
   >
     {/* Emoji + Title */}
@@ -152,7 +154,7 @@ const Card = ({ card, index, onOpenPhoto, onOpenGallery, onOpenClassDetails, onO
   </motion.article>
 );
 
-const CardGrid = ({ onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenMemoryWall, onOpenBatchStats }) => (
+const CardGrid = ({ onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenMemoryWall, onOpenBatchStats, onOpenVideo }) => (
   <section className="relative z-10 px-4 sm:px-8 pb-24 max-w-4xl mx-auto">
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -178,6 +180,7 @@ const CardGrid = ({ onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenMemory
           onOpenClassDetails={onOpenClassDetails}
           onOpenMemoryWall={onOpenMemoryWall}
           onOpenBatchStats={onOpenBatchStats}
+          onOpenVideo={onOpenVideo}
         />
       ))}
     </div>
