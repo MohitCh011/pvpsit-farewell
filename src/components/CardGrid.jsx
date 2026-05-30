@@ -24,8 +24,6 @@ const cards = [
     href: '#',
     isGallery: true,
   },
-
-
   {
     id: 'class-details',
     emoji: '📋',
@@ -50,6 +48,30 @@ const cards = [
     href: '/class-photo.jpg',
     isPhoto: true,
   },
+  {
+    id: 'memory-wall',
+    emoji: '💬',
+    title: 'Digital Yearbook',
+    description: 'Leave a permanent memory note, confession, or sign-off message in our yearbook.',
+    button: 'Write & Read Notes',
+    gradient: 'from-fuchsia-600/30 to-pink-800/20',
+    glow: 'rgba(219, 39, 119, 0.4)',
+    accentColor: '#ec4899',
+    href: '#',
+    isMemoryWall: true,
+  },
+  {
+    id: 'batch-stats',
+    emoji: '📊',
+    title: 'Batch Statistics',
+    description: 'Fun numbers, animated counters of class metrics, and classroom superlative awards.',
+    button: 'View Stats',
+    gradient: 'from-yellow-600/30 to-red-800/20',
+    glow: 'rgba(245, 158, 11, 0.4)',
+    accentColor: '#f59e0b',
+    href: '#',
+    isBatchStats: true,
+  },
 ];
 
 const cardVariants = {
@@ -66,7 +88,7 @@ const cardVariants = {
   }),
 };
 
-const Card = ({ card, index, onOpenPhoto, onOpenGallery, onOpenClassDetails }) => (
+const Card = ({ card, index, onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenMemoryWall, onOpenBatchStats }) => (
   <motion.article
     id={card.id}
     custom={index}
@@ -78,6 +100,14 @@ const Card = ({ card, index, onOpenPhoto, onOpenGallery, onOpenClassDetails }) =
     transition={{ type: 'spring', stiffness: 300, damping: 20 }}
     className={`glass-card p-6 sm:p-7 flex flex-col gap-4 cursor-pointer bg-gradient-to-br ${card.gradient}`}
     style={{ '--glow-color': card.glow }}
+    onClick={
+      card.isPhoto ? onOpenPhoto
+        : card.isGallery ? onOpenGallery
+          : card.isClassDetails ? onOpenClassDetails
+            : card.isMemoryWall ? onOpenMemoryWall
+              : card.isBatchStats ? onOpenBatchStats
+                : undefined
+    }
   >
     {/* Emoji + Title */}
     <div className="flex items-start gap-3">
@@ -109,12 +139,6 @@ const Card = ({ card, index, onOpenPhoto, onOpenGallery, onOpenClassDetails }) =
       whileTap={{ scale: 0.97 }}
       className="glow-btn relative z-10 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white select-none"
       aria-label={`${card.button} - ${card.title}`}
-      onClick={
-        card.isPhoto ? onOpenPhoto
-          : card.isGallery ? onOpenGallery
-            : card.isClassDetails ? onOpenClassDetails
-              : undefined
-      }
     >
       <span className="relative z-10">{card.button}</span>
       <motion.span
@@ -128,8 +152,8 @@ const Card = ({ card, index, onOpenPhoto, onOpenGallery, onOpenClassDetails }) =
   </motion.article>
 );
 
-const CardGrid = ({ onOpenPhoto, onOpenGallery, onOpenClassDetails }) => (
-  <section className="relative z-10 px-4 sm:px-8 pb-24 max-w-3xl mx-auto">
+const CardGrid = ({ onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenMemoryWall, onOpenBatchStats }) => (
+  <section className="relative z-10 px-4 sm:px-8 pb-24 max-w-4xl mx-auto">
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -139,13 +163,22 @@ const CardGrid = ({ onOpenPhoto, onOpenGallery, onOpenClassDetails }) => (
     >
       <h2 className="text-3xl sm:text-4xl font-bold gradient-text mb-3">Your Memory Capsule</h2>
       <p className="text-slate-400 text-base sm:text-lg max-w-xl mx-auto">
-        Four years compressed into four moments. Click to relive them.
+        Four years compressed into digital moments. Click to explore and relive them.
       </p>
     </motion.div>
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
       {cards.map((card, i) => (
-        <Card key={card.id} card={card} index={i} onOpenPhoto={onOpenPhoto} onOpenGallery={onOpenGallery} onOpenClassDetails={onOpenClassDetails} />
+        <Card
+          key={card.id}
+          card={card}
+          index={i}
+          onOpenPhoto={onOpenPhoto}
+          onOpenGallery={onOpenGallery}
+          onOpenClassDetails={onOpenClassDetails}
+          onOpenMemoryWall={onOpenMemoryWall}
+          onOpenBatchStats={onOpenBatchStats}
+        />
       ))}
     </div>
   </section>

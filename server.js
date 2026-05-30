@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 const DATA_FILE = path.join(__dirname, 'students.json');
+const MESSAGES_FILE = path.join(__dirname, 'messages.json');
 
 app.use(cors());
 app.use(express.json());
@@ -35,6 +36,32 @@ async function writeStudentsData(data) {
     return false;
   }
 }
+
+// Helper function to read messages data
+async function readMessagesData() {
+  try {
+    const data = await fs.readFile(MESSAGES_FILE, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Error reading messages database file:', error);
+    return [];
+  }
+}
+
+// Helper function to write messages data
+async function writeMessagesData(data) {
+  try {
+    await fs.writeFile(MESSAGES_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    return true;
+  } catch (error) {
+    console.error('Error writing to messages database file:', error);
+    return false;
+  }
+}
+
+// ────────────────────────────────────────────────────────────────
+//  STUDENTS ENDPOINTS
+// ────────────────────────────────────────────────────────────────
 
 // API endpoint to fetch all students
 app.get('/api/students', async (req, res) => {
@@ -66,6 +93,60 @@ app.delete('/api/students/:htno', async (req, res) => {
     res.json({ success: true, message: `Student with HTNO ${htno} has been deleted successfully.` });
   } else {
     res.status(500).json({ error: 'Failed to write updated data to file' });
+  }
+});
+
+// ────────────────────────────────────────────────────────────────
+//  MESSAGES ENDPOINTS
+// ────────────────────────────────────────────────────────────────
+
+// API endpoint to fetch all yearbook messages
+app.get('/api/messages', async (req, res) => {
+  const messages = await readMessagesData();
+  res.json(messages);
+});
+
+// API endpoint to post a new yearbook message
+app.post('/api/messages', async (req, res) => {
+  const { name, message, theme } = req.body;
+  if (!name || !message) {
+    return res.status(400).json({ error: 'Name and message are required' });
+  }
+
+  const messages = await readMessagesData();
+  const newMessage = {
+    id: Date.now().toString(),
+    name: name.trim(),
+    message: message.trim(),
+    theme: theme || 'purple',
+    timestamp: Date.now()
+  };
+
+  messages.unshift(newMessage); // Newest messages at the top
+  const success = await writeMessagesData(messages);
+
+  if (success) {
+    res.status(201).json(newMessage);
+  } else {
+    res.status(500).json({ error: 'Failed to save message' });
+  }
+});
+
+// API endpoint to delete a message by ID
+app.delete('/api/messages/:id', async (req, res) => {
+  const { id } = req.params;
+  const messages = await readMessagesData();
+  const filtered = messages.filter(msg => msg.id !== id);
+
+  if (messages.length === filtered.length) {
+    return res.status(404).json({ error: 'Message not found' });
+  }
+
+  const success = await writeMessagesData(filtered);
+  if (success) {
+    res.json({ success: true, message: 'Message deleted successfully.' });
+  } else {
+    res.status(500).json({ error: 'Failed to delete message' });
   }
 });
 

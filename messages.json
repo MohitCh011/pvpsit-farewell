@@ -1,0 +1,23 @@
+[
+  {
+    "id": "1",
+    "name": "Harish K",
+    "message": "Remember the lab sessions where we spent 90% of our time debugging semicolons and 10% coding? Best days ever! 💻",
+    "theme": "purple",
+    "timestamp": 1782782782782
+  },
+  {
+    "id": "2",
+    "name": "Naimisha A",
+    "message": "CSE-1 batch was something else. From proxy attendances to mass bunks, we lived it all. Cheers to 2022-2026! 🥂🎓",
+    "theme": "sunset",
+    "timestamp": 1782782792782
+  },
+  {
+    "id": "3",
+    "name": "Mohit C",
+    "message": "Can't believe we are finally graduating. Will miss the cafeteria gossips and the late-night exam preps the most! Stay in touch everyone! ❤️",
+    "theme": "emerald",
+    "timestamp": 1782782802782
+  }
+]

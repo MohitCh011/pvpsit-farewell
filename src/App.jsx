@@ -6,6 +6,8 @@ import Footer from './components/Footer';
 import PhotoViewer from './components/PhotoViewer';
 import GalleryViewer from './components/GalleryViewer';
 import ClassDetails from './components/ClassDetails';
+import MemoryWall from './components/MemoryWall';
+import BatchStats from './components/BatchStats';
 import BackgroundMusic from './components/BackgroundMusic';
 import ScrollToTop from './components/ScrollToTop';
 import './index.css';
@@ -14,6 +16,8 @@ function App() {
   const [photoOpen, setPhotoOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [classDetailsOpen, setClassDetailsOpen] = useState(false);
+  const [memoryWallOpen, setMemoryWallOpen] = useState(false);
+  const [batchStatsOpen, setBatchStatsOpen] = useState(false);
 
   return (
     <div className="relative min-h-screen" style={{ background: 'linear-gradient(135deg, #020010 0%, #0a0025 30%, #07001a 60%, #020010 100%)' }}>
@@ -79,6 +83,8 @@ function App() {
           onOpenPhoto={() => setPhotoOpen(true)}
           onOpenGallery={() => setGalleryOpen(true)}
           onOpenClassDetails={() => setClassDetailsOpen(true)}
+          onOpenMemoryWall={() => setMemoryWallOpen(true)}
+          onOpenBatchStats={() => setBatchStatsOpen(true)}
         />
         <Footer />
       </main>
@@ -91,6 +97,12 @@ function App() {
 
       {/* Class details */}
       <ClassDetails isOpen={classDetailsOpen} onClose={() => setClassDetailsOpen(false)} />
+
+      {/* Memory wall (Digital Yearbook) */}
+      <MemoryWall isOpen={memoryWallOpen} onClose={() => setMemoryWallOpen(false)} />
+
+      {/* Batch Stats dashboard */}
+      <BatchStats isOpen={batchStatsOpen} onClose={() => setBatchStatsOpen(false)} />
 
       {/* Floating features */}
       <ScrollToTop />
