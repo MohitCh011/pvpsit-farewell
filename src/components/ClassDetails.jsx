@@ -1,5 +1,6 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+
 
 const STUDENTS = [
   { sno: 1,  htno: '22501A0501', name: 'AAKASH KODALI' },
@@ -77,23 +78,92 @@ const STUDENTS = [
 ];
 
 const ClassDetails = ({ isOpen, onClose }) => {
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isOffline, setIsOffline] = useState(false);
   const [search, setSearch] = useState('');
   const [showScroll, setShowScroll] = useState(false);
+  const [deletingStudent, setDeletingStudent] = useState(null);
+  const [toastMessage, setToastMessage] = useState(null);
   const scrollRef = useRef(null);
+
+  // Fetch students from backend
+  const fetchStudents = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/students');
+      if (!res.ok) throw new Error('Failed to fetch from backend');
+      const data = await res.json();
+      setStudents(data);
+      setIsOffline(false);
+    } catch (err) {
+      console.warn('Backend offline, using fallback static data:', err);
+      setStudents(STUDENTS);
+      setIsOffline(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchStudents();
+    }
+  }, [isOpen]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
-    if (!q) return STUDENTS;
-    return STUDENTS.filter(s =>
+    if (!q) return students;
+    return students.filter(s =>
       s.name.toLowerCase().includes(q) || s.htno.toLowerCase().includes(q)
     );
-  }, [search]);
+  }, [search, students]);
 
   // Lock scroll
   useState(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
+
+  const handleDelete = (student) => {
+    setDeletingStudent(student);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingStudent) return;
+    const { htno, name } = deletingStudent;
+    
+    try {
+      if (isOffline) {
+        // Fallback: Delete locally
+        const updated = students.filter(s => s.htno !== htno).map((s, idx) => ({ ...s, sno: idx + 1 }));
+        setStudents(updated);
+        showToast(`Removed ${name} locally (Offline mode)`);
+      } else {
+        const res = await fetch(`/api/students/${htno}`, {
+          method: 'DELETE',
+        });
+        if (!res.ok) throw new Error('Failed to delete student');
+        
+        // Update state
+        const updated = students.filter(s => s.htno !== htno).map((s, idx) => ({ ...s, sno: idx + 1 }));
+        setStudents(updated);
+        showToast(`Successfully deleted ${name}`);
+      }
+    } catch (err) {
+      console.error(err);
+      showToast(`Error deleting student: ${err.message}`, true);
+    } finally {
+      setDeletingStudent(null);
+    }
+  };
+
+  const showToast = (msg, isError = false) => {
+    setToastMessage({ text: msg, isError });
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 4000);
+  };
 
   return (
     <AnimatePresence>
@@ -171,7 +241,7 @@ const ClassDetails = ({ isOpen, onClose }) => {
 
             {/* Count */}
             <p className="text-center text-xs text-slate-500 mt-2">
-              {filtered.length} of {STUDENTS.length} students
+              {filtered.length} of {students.length} students
             </p>
           </motion.div>
 
@@ -183,17 +253,31 @@ const ClassDetails = ({ isOpen, onClose }) => {
               transition={{ duration: 0.4, delay: 0.2 }}
               className="max-w-2xl mx-auto"
             >
+              {/* Offline mode warning */}
+              {isOffline && (
+                <div className="bg-amber-500/10 border border-amber-500/30 text-amber-300 px-4 py-2 rounded-xl text-xs flex items-center justify-between max-w-md mx-auto mb-4">
+                  <span>⚠️ Backend offline. Local fallback database active.</span>
+                  <button onClick={fetchStudents} className="underline hover:text-white font-bold ml-2">Retry Link</button>
+                </div>
+              )}
+
               {/* Table header */}
               <div className="grid grid-cols-12 gap-2 px-3 py-2 mb-2 rounded-lg sticky top-0 text-xs font-bold uppercase tracking-wider"
                 style={{ background: 'rgba(139,92,246,0.15)', color: '#c084fc' }}>
                 <div className="col-span-1">#</div>
                 <div className="col-span-4">Hall Ticket</div>
-                <div className="col-span-7">Student Name</div>
+                <div className="col-span-6">Student Name</div>
+                <div className="col-span-1 text-right pr-2">Action</div>
               </div>
 
               {/* Rows */}
               <div className="space-y-1">
-                {filtered.length === 0 ? (
+                {loading ? (
+                  <div className="text-center text-slate-500 py-12 text-sm flex flex-col items-center justify-center gap-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-500"></div>
+                    Loading class roster...
+                  </div>
+                ) : filtered.length === 0 ? (
                   <div className="text-center text-slate-500 py-12 text-sm">No students found</div>
                 ) : (
                   filtered.map((s, i) => {
@@ -204,7 +288,7 @@ const ClassDetails = ({ isOpen, onClose }) => {
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: Math.min(i * 0.015, 0.5) }}
-                        className="grid grid-cols-12 gap-2 px-3 py-2.5 rounded-lg text-sm transition-colors"
+                        className="grid grid-cols-12 gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
                         style={{
                           background: i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'transparent',
                           border: '1px solid transparent',
@@ -222,7 +306,18 @@ const ClassDetails = ({ isOpen, onClose }) => {
                             <span className="ml-1 text-xs px-1 rounded" style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24', fontSize: '9px' }}>LE</span>
                           )}
                         </div>
-                        <div className="col-span-7 text-white font-medium flex items-center text-xs sm:text-sm leading-tight">{s.name}</div>
+                        <div className="col-span-6 text-white font-medium flex items-center text-xs sm:text-sm leading-tight">{s.name}</div>
+                        <div className="col-span-1 flex items-center justify-end">
+                          <button
+                            onClick={() => handleDelete(s)}
+                            className="text-slate-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
+                            title="Delete Student"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
                       </motion.div>
                     );
                   })
@@ -254,6 +349,70 @@ const ClassDetails = ({ isOpen, onClose }) => {
               >
                 ↑
               </motion.button>
+            )}
+          </AnimatePresence>
+
+          {/* Confirmation Modal */}
+          <AnimatePresence>
+            {deletingStudent && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+              >
+                <motion.div
+                  initial={{ scale: 0.95, y: 10 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0.95, y: 10 }}
+                  className="w-full max-w-sm rounded-2xl p-6 border text-left"
+                  style={{
+                    background: '#090126',
+                    borderColor: 'rgba(139,92,246,0.3)',
+                    boxShadow: '0 0 30px rgba(139,92,246,0.2)'
+                  }}
+                >
+                  <h3 className="text-lg font-bold text-white mb-2">Delete Student?</h3>
+                  <p className="text-sm text-slate-300 mb-6">
+                    Are you sure you want to delete <span className="font-semibold text-purple-400">{deletingStudent.name}</span> ({deletingStudent.htno})? This action will remove them from the class roster.
+                  </p>
+                  <div className="flex justify-end gap-3">
+                    <button
+                      onClick={() => setDeletingStudent(null)}
+                      className="px-4 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={confirmDelete}
+                      className="px-4 py-2 text-sm font-semibold rounded-lg text-white bg-red-600 hover:bg-red-500 transition-colors shadow-lg shadow-red-600/20"
+                    >
+                      Confirm Delete
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Toast Notification */}
+          <AnimatePresence>
+            {toastMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 50, scale: 0.9 }}
+                className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 shadow-xl border"
+                style={{
+                  background: toastMessage.isError ? 'rgba(220,38,38,0.95)' : 'rgba(139,92,246,0.95)',
+                  borderColor: toastMessage.isError ? 'rgba(220,38,38,0.4)' : 'rgba(167,139,250,0.4)',
+                  color: '#fff',
+                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)'
+                }}
+              >
+                <span>{toastMessage.isError ? '❌' : '✨'}</span>
+                <span>{toastMessage.text}</span>
+              </motion.div>
             )}
           </AnimatePresence>
         </motion.div>
