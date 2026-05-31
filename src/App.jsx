@@ -6,8 +6,6 @@ import Footer from './components/Footer';
 import PhotoViewer from './components/PhotoViewer';
 import GalleryViewer from './components/GalleryViewer';
 import ClassDetails from './components/ClassDetails';
-import MemoryWall from './components/MemoryWall';
-import BatchStats from './components/BatchStats';
 import VideoPlayer from './components/VideoPlayer';
 import BackgroundMusic from './components/BackgroundMusic';
 import ScrollToTop from './components/ScrollToTop';
@@ -17,8 +15,6 @@ function App() {
   const [photoOpen, setPhotoOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [classDetailsOpen, setClassDetailsOpen] = useState(false);
-  const [memoryWallOpen, setMemoryWallOpen] = useState(false);
-  const [batchStatsOpen, setBatchStatsOpen] = useState(false);
   const [videoOpen, setVideoOpen] = useState(false);
 
   return (
@@ -85,8 +81,6 @@ function App() {
           onOpenPhoto={() => setPhotoOpen(true)}
           onOpenGallery={() => setGalleryOpen(true)}
           onOpenClassDetails={() => setClassDetailsOpen(true)}
-          onOpenMemoryWall={() => setMemoryWallOpen(true)}
-          onOpenBatchStats={() => setBatchStatsOpen(true)}
           onOpenVideo={() => setVideoOpen(true)}
         />
         <Footer />
@@ -100,12 +94,6 @@ function App() {
 
       {/* Class details */}
       <ClassDetails isOpen={classDetailsOpen} onClose={() => setClassDetailsOpen(false)} />
-
-      {/* Memory wall (Digital Yearbook) */}
-      <MemoryWall isOpen={memoryWallOpen} onClose={() => setMemoryWallOpen(false)} />
-
-      {/* Batch Stats dashboard */}
-      <BatchStats isOpen={batchStatsOpen} onClose={() => setBatchStatsOpen(false)} />
 
       {/* Memories Video Player Modal */}
       <VideoPlayer isOpen={videoOpen} onClose={() => setVideoOpen(false)} />

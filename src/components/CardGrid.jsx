@@ -49,30 +49,6 @@ const cards = [
     href: '/class-photo.jpg',
     isPhoto: true,
   },
-  {
-    id: 'memory-wall',
-    emoji: '💬',
-    title: 'Digital Yearbook',
-    description: 'Leave a permanent memory note, confession, or sign-off message in our yearbook.',
-    button: 'Write & Read Notes',
-    gradient: 'from-fuchsia-600/30 to-pink-800/20',
-    glow: 'rgba(219, 39, 119, 0.4)',
-    accentColor: '#ec4899',
-    href: '#',
-    isMemoryWall: true,
-  },
-  {
-    id: 'batch-stats',
-    emoji: '📊',
-    title: 'Batch Statistics',
-    description: 'Fun numbers, animated counters of class metrics, and classroom superlative awards.',
-    button: 'View Stats',
-    gradient: 'from-yellow-600/30 to-red-800/20',
-    glow: 'rgba(245, 158, 11, 0.4)',
-    accentColor: '#f59e0b',
-    href: '#',
-    isBatchStats: true,
-  },
 ];
 
 const cardVariants = {
@@ -89,7 +65,7 @@ const cardVariants = {
   }),
 };
 
-const Card = ({ card, index, onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenMemoryWall, onOpenBatchStats, onOpenVideo }) => (
+const Card = ({ card, index, onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenVideo }) => (
   <motion.article
     id={card.id}
     custom={index}
@@ -105,10 +81,8 @@ const Card = ({ card, index, onOpenPhoto, onOpenGallery, onOpenClassDetails, onO
       card.isPhoto ? onOpenPhoto
         : card.isGallery ? onOpenGallery
           : card.isClassDetails ? onOpenClassDetails
-            : card.isMemoryWall ? onOpenMemoryWall
-              : card.isBatchStats ? onOpenBatchStats
-                : card.isMemoriesVideo ? onOpenVideo
-                  : undefined
+            : card.isMemoriesVideo ? onOpenVideo
+              : undefined
     }
   >
     {/* Emoji + Title */}
@@ -154,7 +128,7 @@ const Card = ({ card, index, onOpenPhoto, onOpenGallery, onOpenClassDetails, onO
   </motion.article>
 );
 
-const CardGrid = ({ onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenMemoryWall, onOpenBatchStats, onOpenVideo }) => (
+const CardGrid = ({ onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenVideo }) => (
   <section className="relative z-10 px-4 sm:px-8 pb-24 max-w-4xl mx-auto">
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -178,8 +152,6 @@ const CardGrid = ({ onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenMemory
           onOpenPhoto={onOpenPhoto}
           onOpenGallery={onOpenGallery}
           onOpenClassDetails={onOpenClassDetails}
-          onOpenMemoryWall={onOpenMemoryWall}
-          onOpenBatchStats={onOpenBatchStats}
           onOpenVideo={onOpenVideo}
         />
       ))}

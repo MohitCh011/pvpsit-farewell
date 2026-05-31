@@ -120,7 +120,7 @@ const ClassDetails = ({ isOpen, onClose }) => {
   }, [search, students]);
 
   // Lock scroll
-  useState(() => {
+  useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
@@ -253,13 +253,7 @@ const ClassDetails = ({ isOpen, onClose }) => {
               transition={{ duration: 0.4, delay: 0.2 }}
               className="max-w-2xl mx-auto"
             >
-              {/* Offline mode warning */}
-              {isOffline && (
-                <div className="bg-amber-500/10 border border-amber-500/30 text-amber-300 px-4 py-2 rounded-xl text-xs flex items-center justify-between max-w-md mx-auto mb-4">
-                  <span>⚠️ Backend offline. Local fallback database active.</span>
-                  <button onClick={fetchStudents} className="underline hover:text-white font-bold ml-2">Retry Link</button>
-                </div>
-              )}
+
 
               {/* Table header */}
               <div className="grid grid-cols-12 gap-2 px-3 py-2 mb-2 rounded-lg sticky top-0 text-xs font-bold uppercase tracking-wider"
