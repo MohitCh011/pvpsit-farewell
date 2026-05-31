@@ -10,7 +10,6 @@ const ClassDetails = ({ isOpen, onClose }) => {
   const [isOffline, setIsOffline] = useState(false);
   const [search, setSearch] = useState('');
   const [showScroll, setShowScroll] = useState(false);
-  const [deletingStudent, setDeletingStudent] = useState(null);
   const [activeStudent, setActiveStudent] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
   const scrollRef = useRef(null);
@@ -53,38 +52,7 @@ const ClassDetails = ({ isOpen, onClose }) => {
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
-  const handleDelete = (student) => {
-    setDeletingStudent(student);
-  };
 
-  const confirmDelete = async () => {
-    if (!deletingStudent) return;
-    const { htno, name } = deletingStudent;
-    
-    try {
-      if (isOffline) {
-        // Fallback: Delete locally
-        const updated = students.filter(s => s.htno !== htno).map((s, idx) => ({ ...s, sno: idx + 1 }));
-        setStudents(updated);
-        showToast(`Removed ${name} locally (Offline mode)`);
-      } else {
-        const res = await fetch(`/api/students/${htno}`, {
-          method: 'DELETE',
-        });
-        if (!res.ok) throw new Error('Failed to delete student');
-        
-        // Update state
-        const updated = students.filter(s => s.htno !== htno).map((s, idx) => ({ ...s, sno: idx + 1 }));
-        setStudents(updated);
-        showToast(`Successfully deleted ${name}`);
-      }
-    } catch (err) {
-      console.error(err);
-      showToast(`Error deleting student: ${err.message}`, true);
-    } finally {
-      setDeletingStudent(null);
-    }
-  };
 
   const showToast = (msg, isError = false) => {
     setToastMessage({ text: msg, isError });
@@ -188,8 +156,7 @@ const ClassDetails = ({ isOpen, onClose }) => {
                 style={{ background: 'rgba(139,92,246,0.15)', color: '#c084fc' }}>
                 <div className="col-span-1">#</div>
                 <div className="col-span-4">Hall Ticket</div>
-                <div className="col-span-6">Student Name</div>
-                <div className="col-span-1 text-right pr-2">Action</div>
+                <div className="col-span-7">Student Name</div>
               </div>
 
               {/* Rows */}
@@ -229,18 +196,7 @@ const ClassDetails = ({ isOpen, onClose }) => {
                             <span className="ml-1 text-xs px-1 rounded" style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24', fontSize: '9px' }}>LE</span>
                           )}
                         </div>
-                        <div className="col-span-6 text-white font-medium flex items-center text-xs sm:text-sm leading-tight">{s.name}</div>
-                        <div className="col-span-1 flex items-center justify-end">
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handleDelete(s); }}
-                            className="text-slate-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
-                            title="Delete Student"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
+                        <div className="col-span-7 text-white font-medium flex items-center text-xs sm:text-sm leading-tight">{s.name}</div>
                       </motion.div>
                     );
                   })
@@ -275,48 +231,7 @@ const ClassDetails = ({ isOpen, onClose }) => {
             )}
           </AnimatePresence>
 
-          {/* Confirmation Modal */}
-          <AnimatePresence>
-            {deletingStudent && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-              >
-                <motion.div
-                  initial={{ scale: 0.95, y: 10 }}
-                  animate={{ scale: 1, y: 0 }}
-                  exit={{ scale: 0.95, y: 10 }}
-                  className="w-full max-w-sm rounded-2xl p-6 border text-left"
-                  style={{
-                    background: '#090126',
-                    borderColor: 'rgba(139,92,246,0.3)',
-                    boxShadow: '0 0 30px rgba(139,92,246,0.2)'
-                  }}
-                >
-                  <h3 className="text-lg font-bold text-white mb-2">Delete Student?</h3>
-                  <p className="text-sm text-slate-300 mb-6">
-                    Are you sure you want to delete <span className="font-semibold text-purple-400">{deletingStudent.name}</span> ({deletingStudent.htno})? This action will remove them from the class roster.
-                  </p>
-                  <div className="flex justify-end gap-3">
-                    <button
-                      onClick={() => setDeletingStudent(null)}
-                      className="px-4 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={confirmDelete}
-                      className="px-4 py-2 text-sm font-semibold rounded-lg text-white bg-red-600 hover:bg-red-500 transition-colors shadow-lg shadow-red-600/20"
-                    >
-                      Confirm Delete
-                    </button>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+
 
           {/* Toast Notification */}
           <AnimatePresence>
