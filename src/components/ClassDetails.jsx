@@ -101,6 +101,7 @@ const ClassDetails = ({ isOpen, onClose }) => {
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 mt-0.5">PVPSIT · Batch 2022–2026</p>
+                <p className="text-[10px] text-purple-300/70 mt-1 italic font-medium">💡 Press the name or roll number to get more details</p>
               </div>
 
               <motion.button
