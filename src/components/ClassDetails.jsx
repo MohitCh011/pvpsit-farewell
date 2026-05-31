@@ -2,80 +2,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 
-const STUDENTS = [
-  { sno: 1,  htno: '22501A0501', name: 'AAKASH KODALI' },
-  { sno: 2,  htno: '22501A0502', name: 'ABDUL AZEEZ' },
-  { sno: 3,  htno: '22501A0503', name: 'ABDUL JABBAR' },
-  { sno: 4,  htno: '22501A0504', name: 'ADAPA HEMESH' },
-  { sno: 5,  htno: '22501A0505', name: 'AKURI NAIMISHA' },
-  { sno: 6,  htno: '22501A0506', name: 'ALA SRUTHI SREE' },
-  { sno: 7,  htno: '22501A0507', name: 'ALLAMSETTI HARSHINI' },
-  { sno: 8,  htno: '22501A0508', name: 'ALURI MEENAKSHI' },
-  { sno: 9,  htno: '22501A0509', name: 'ALURI SINDHU' },
-  { sno: 10, htno: '22501A0510', name: 'AMRUTHALURI NAGA PAVAN KUMAR' },
-  { sno: 11, htno: '22501A0511', name: 'ANANDA SATYA SAI SREEKAR PULA' },
-  { sno: 12, htno: '22501A0512', name: 'ANJUSRI KANDI' },
-  { sno: 13, htno: '22501A0513', name: 'ANKEM GREESHWANTH' },
-  { sno: 14, htno: '22501A0514', name: 'ANNE GRISHMANTH RAM CHOWDARY' },
-  { sno: 15, htno: '22501A0515', name: 'APPANA HARINI' },
-  { sno: 16, htno: '22501A0516', name: 'AVVARI SAI ANIL KUMAR' },
-  { sno: 17, htno: '22501A0517', name: 'BALLA NAVYA SRI' },
-  { sno: 18, htno: '22501A0518', name: 'BANDAPU BHUVANESWARA RAO' },
-  { sno: 19, htno: '22501A0519', name: 'BANOTHU PRAVEEN NAYAK' },
-  { sno: 20, htno: '22501A0520', name: 'BATHULA KIRAN KUMAR' },
-  { sno: 21, htno: '22501A0521', name: 'BATTU NAGA ROOPA SRI' },
-  { sno: 22, htno: '22501A0522', name: 'BEZWADA RAJ DEEP' },
-  { sno: 23, htno: '22501A0523', name: 'BHUKYA JAYANTHI' },
-  { sno: 24, htno: '22501A0524', name: 'BHUKYA SOWMYA' },
-  { sno: 25, htno: '22501A0525', name: 'BOODALA AKHIL' },
-  { sno: 26, htno: '22501A0526', name: 'BORRA SAI SRIKAR' },
-  { sno: 27, htno: '22501A0527', name: 'BUDDAVARAPU GOWTHAMI PRIYA' },
-  { sno: 28, htno: '22501A0528', name: 'BURRA TOOJITHA THANU SRI' },
-  { sno: 29, htno: '22501A0529', name: 'CHALLAPALLI SATYA VENKATA HEMANTH' },
-  { sno: 30, htno: '22501A0530', name: 'CHANDALURI MOHIT' },
-  { sno: 31, htno: '22501A0531', name: 'CHANDHANA CHANDRA SHEKAR' },
-  { sno: 32, htno: '22501A0532', name: 'CHINNI PUNITA SAI DHEERAJ' },
-  { sno: 33, htno: '22501A0533', name: 'CHINTHALAPATI SRI VENKATA SAI SUBRAHMANYAM' },
-  { sno: 34, htno: '22501A0534', name: 'CHITTA SAI LAKSHMI MEGHANA' },
-  { sno: 35, htno: '22501A0535', name: 'CHODAPANEEDI SAI NISANTH' },
-  { sno: 36, htno: '22501A0536', name: 'DALLI DELISHA' },
-  { sno: 37, htno: '22501A0537', name: 'DANGUDUBIYYAPU AKASH' },
-  { sno: 38, htno: '22501A0538', name: 'DASARI LIKHITHA SRI' },
-  { sno: 39, htno: '22501A0539', name: 'DASARI NEERAJA' },
-  { sno: 40, htno: '22501A0540', name: 'DEVANABOINA RENUKA VENKATA PADMA' },
-  { sno: 41, htno: '22501A0541', name: 'DIRISALA BHARGAVI' },
-  { sno: 42, htno: '22501A0542', name: 'EDA DURGA SRI LAHARI' },
-  { sno: 43, htno: '22501A0543', name: 'EDE LAASYA' },
-  { sno: 44, htno: '22501A0544', name: 'EERUGULA SHELIAN GLADIS' },
-  { sno: 45, htno: '22501A0545', name: 'ERIGINABOYINA HARI KRISHNA' },
-  { sno: 46, htno: '22501A0546', name: 'GALETI LAKSHMI PRIYANKA' },
-  { sno: 47, htno: '22501A0547', name: 'GANDHAM LOKESH' },
-  { sno: 48, htno: '22501A0548', name: 'GANDU NEHA PRIYA' },
-  { sno: 49, htno: '22501A0549', name: 'GARAPATI GOWTHAM CHOWDARY' },
-  { sno: 50, htno: '22501A0550', name: 'GARIKA SUBHASH' },
-  { sno: 51, htno: '22501A0552', name: 'GARIKAPATI SIVA SANKARA VARA PRASAD SIDDU' },
-  { sno: 52, htno: '22501A0553', name: 'GAYAM SRAVANI' },
-  { sno: 53, htno: '22501A0554', name: 'GONA CHARL RAJ' },
-  { sno: 54, htno: '22501A0555', name: 'GOPISETTI ABHIRAM' },
-  { sno: 55, htno: '22501A0556', name: 'GOPISETTY HARSHINI' },
-  { sno: 56, htno: '22501A0557', name: 'GOVVALA VENKATA SAI RAM' },
-  { sno: 57, htno: '22501A0558', name: 'GUBBALA DEVI PRIYA ANJALI' },
-  { sno: 58, htno: '22501A0559', name: 'GUDDANTI SAI PRANITH' },
-  { sno: 59, htno: '22501A0560', name: 'GULUGULURI TEJASWINI' },
-  { sno: 60, htno: '22501A0561', name: 'GUMPELLA SAI SETHU SAI' },
-  { sno: 61, htno: '22501A0562', name: 'GUNTI RANI' },
-  { sno: 62, htno: '22501A0563', name: 'GURRAM VEERA VENKATA LALITH KRISHNA' },
-  { sno: 63, htno: '22501A0564', name: 'HUNAINA HAFSA' },
-  { sno: 64, htno: '22501A0565', name: 'ILLATURI SAKETH' },
-  { sno: 65, htno: '22501A0566', name: 'INDURI NITHYANANDA REDDY' },
-  // Lateral entries
-  { sno: 66, htno: '23505A0501', name: 'ADAPALA MRUDULA' },
-  { sno: 67, htno: '23505A0502', name: 'CHORAGUDI SRUTHI' },
-  { sno: 68, htno: '23505A0503', name: 'CHUNDURU KESAVA HARSHITHA' },
-  { sno: 69, htno: '23505A0504', name: 'KOPPULA SANDEEP' },
-  { sno: 70, htno: '23505A0505', name: 'KUMBHAGIRI RAKESH' },
-  { sno: 71, htno: '23505A0506', name: 'MAREPALLI SIVANI' },
-];
+import STUDENTS from '../../students.json';
 
 const ClassDetails = ({ isOpen, onClose }) => {
   const [students, setStudents] = useState([]);
@@ -84,6 +11,7 @@ const ClassDetails = ({ isOpen, onClose }) => {
   const [search, setSearch] = useState('');
   const [showScroll, setShowScroll] = useState(false);
   const [deletingStudent, setDeletingStudent] = useState(null);
+  const [activeStudent, setActiveStudent] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
   const scrollRef = useRef(null);
 
@@ -282,7 +210,8 @@ const ClassDetails = ({ isOpen, onClose }) => {
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: Math.min(i * 0.015, 0.5) }}
-                        className="grid grid-cols-12 gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
+                        className="grid grid-cols-12 gap-2 px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer"
+                        onClick={() => setActiveStudent(s)}
                         style={{
                           background: i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'transparent',
                           border: '1px solid transparent',
@@ -303,7 +232,7 @@ const ClassDetails = ({ isOpen, onClose }) => {
                         <div className="col-span-6 text-white font-medium flex items-center text-xs sm:text-sm leading-tight">{s.name}</div>
                         <div className="col-span-1 flex items-center justify-end">
                           <button
-                            onClick={() => handleDelete(s)}
+                            onClick={(e) => { e.stopPropagation(); handleDelete(s); }}
                             className="text-slate-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
                             title="Delete Student"
                           >
@@ -406,6 +335,89 @@ const ClassDetails = ({ isOpen, onClose }) => {
               >
                 <span>{toastMessage.isError ? '❌' : '✨'}</span>
                 <span>{toastMessage.text}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Student Profile Modal */}
+          <AnimatePresence>
+            {activeStudent && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                onClick={() => setActiveStudent(null)}
+              >
+                <motion.div
+                  initial={{ scale: 0.9, y: 20 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0.9, y: 20 }}
+                  className="w-full max-w-sm rounded-3xl p-6 border text-center relative overflow-hidden"
+                  style={{
+                    background: 'linear-gradient(135deg, #090126 0%, #15003c 100%)',
+                    borderColor: 'rgba(168, 85, 247, 0.3)',
+                    boxShadow: '0 10px 40px rgba(168, 85, 247, 0.15)'
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Close button */}
+                  <button
+                    onClick={() => setActiveStudent(null)}
+                    className="absolute top-4 right-4 text-slate-400 hover:text-white text-lg w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors"
+                  >
+                    ✕
+                  </button>
+
+                  {/* Profile Glow Ring */}
+                  <div className="mx-auto w-40 h-40 rounded-full p-1 mb-4 flex items-center justify-center bg-gradient-to-tr from-purple-500 via-pink-500 to-blue-500 shadow-lg shadow-purple-500/20 relative">
+                    <div className="w-full h-full rounded-full bg-[#0a0025] overflow-hidden flex items-center justify-center relative">
+                      {activeStudent.photoUrl ? (
+                        <img
+                          src={activeStudent.photoUrl}
+                          alt={activeStudent.name}
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = `https://placehold.co/300x300/15003c/a855f7?text=${encodeURIComponent(activeStudent.name.split(' ')[0] || '🎓')}`;
+                          }}
+                        />
+                      ) : (
+                        <span className="text-6xl select-none">🎓</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <h3 className="text-xl font-bold text-white mb-1 tracking-wide">{activeStudent.name}</h3>
+                  
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <span className="font-mono text-sm font-semibold" style={{ color: activeStudent.htno.startsWith('23505') ? '#fbbf24' : '#60a5fa' }}>
+                      {activeStudent.htno}
+                    </span>
+                    <span className="text-xs px-2 py-0.5 rounded-full select-none font-bold" 
+                          style={{ 
+                            background: activeStudent.htno.startsWith('23505') ? 'rgba(251,191,36,0.15)' : 'rgba(96,165,250,0.15)', 
+                            color: activeStudent.htno.startsWith('23505') ? '#fbbf24' : '#60a5fa' 
+                          }}>
+                      {activeStudent.htno.startsWith('23505') ? 'Lateral Entry' : 'Regular'}
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-slate-400 mb-6 italic">
+                    CSE-1 · Batch 2022–2026
+                  </p>
+
+                  <button
+                    onClick={() => setActiveStudent(null)}
+                    className="w-full py-2.5 rounded-xl font-bold text-white shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                    style={{
+                      background: 'linear-gradient(135deg, #7c3aed, #db2777)',
+                    }}
+                  >
+                    Close Profile
+                  </button>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
