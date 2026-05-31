@@ -129,7 +129,7 @@ const Card = ({ card, index, onOpenPhoto, onOpenGallery, onOpenClassDetails, onO
 );
 
 const CardGrid = ({ onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenVideo }) => (
-  <section className="relative z-10 px-4 sm:px-8 pb-24 max-w-4xl mx-auto">
+  <section className="relative z-10 px-4 sm:px-8 pb-24 max-w-3xl mx-auto">
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -143,7 +143,7 @@ const CardGrid = ({ onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenVideo 
       </p>
     </motion.div>
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
       {cards.map((card, i) => (
         <Card
           key={card.id}
