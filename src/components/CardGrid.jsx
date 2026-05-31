@@ -137,7 +137,7 @@ const CardGrid = ({ onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenVideo,
       const next = prev + 1;
       if (next === 20) {
         onEnableAdminMode();
-        alert('Admin mode activated 🛠️');
+        alert('Admin mode activated 🛠️\n\nNote: Since the site is hosted on Vercel (which has a read-only filesystem), hiding media from this screen will only save locally on this device.\n\nTo delete a photo or video permanently for all visitors, remove its line from "src/galleryConfig.js" or "src/galleryVideosConfig.js" and push to Git.');
       }
       return next;
     });
