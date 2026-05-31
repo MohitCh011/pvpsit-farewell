@@ -94,10 +94,12 @@ const ClassDetails = ({ isOpen, onClose }) => {
               </motion.button>
 
               <div className="text-center">
-                <p className="text-sm font-black"
-                  style={{ background: 'linear-gradient(135deg,#c084fc,#818cf8,#38bdf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                  📋 CSE-1 Class Roll
-                </p>
+                <div className="flex items-center justify-center gap-1.5 text-sm font-black text-white">
+                  <span>📋</span>
+                  <span style={{ background: 'linear-gradient(135deg,#c084fc,#818cf8,#38bdf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                    CSE-1 Class Roll
+                  </span>
+                </div>
                 <p className="text-xs text-slate-400 mt-0.5">PVPSIT · Batch 2022–2026</p>
               </div>
 
