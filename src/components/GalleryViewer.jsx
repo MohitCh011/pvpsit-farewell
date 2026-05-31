@@ -341,6 +341,18 @@ const GalleryViewer = ({ isOpen, onClose }) => {
                       <p className="text-slate-400 text-sm mt-1">{isEmpty ? `No ${mediaType} yet` : `${mediaItems.length} ${mediaType}`}</p>
                     </div>
 
+                    {/* Contact Notice Banner */}
+                    <div className="mb-6 p-4 rounded-2xl border text-xs sm:text-sm leading-relaxed max-w-2xl mx-auto text-center"
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.02)',
+                        borderColor: 'rgba(255, 255, 255, 0.06)',
+                        color: 'rgba(203, 213, 225, 0.8)'
+                      }}
+                    >
+                      <span className="mr-1.5 text-base select-none">📢</span>
+                      If any photo or video is unwanted or shouldn&apos;t be visible, please contact your <strong>CR</strong>. To add new photos or videos, email them to <a href="mailto:chmohit1011@gmail.com" className="text-purple-400 hover:text-purple-300 underline font-semibold transition-colors">chmohit1011@gmail.com</a>.
+                    </div>
+
                     {isEmpty ? (
                       <div className="flex flex-col items-center justify-center gap-4 py-16 text-slate-500">
                         <span className="text-5xl">🖼️</span>
