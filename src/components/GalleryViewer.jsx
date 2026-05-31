@@ -10,7 +10,7 @@ const sha256 = async (text) => {
 };
 
 // Stages: 'select' | 'password' | 'mediaSelect' | 'gallery'  (lightbox = gallery + lightboxIdx !== null)
-const GalleryViewer = ({ isOpen, onClose }) => {
+const GalleryViewer = ({ isOpen, onClose, adminMode }) => {
   const [stage, setStage] = useState('select');
   const [gender, setGender] = useState(null);
   const [mediaType, setMediaType] = useState(null);
@@ -20,6 +20,7 @@ const GalleryViewer = ({ isOpen, onClose }) => {
   const [shake, setShake] = useState(false);
   const [lightboxIdx, setLightboxIdx] = useState(null);
   const [showScroll, setShowScroll] = useState(false);
+  const [hiddenMedia, setHiddenMedia] = useState([]);
   const inputRef = useRef(null);
   const scrollRef = useRef(null);
 
@@ -28,7 +29,7 @@ const GalleryViewer = ({ isOpen, onClose }) => {
     if (gender === 'girls') return mediaType === 'videos' ? GIRLS_VIDEOS : GIRLS_PHOTOS;
     return [];
   };
-  const mediaItems = getMediaItems();
+  const mediaItems = getMediaItems().filter(item => !hiddenMedia.includes(item.src));
   const isEmpty = mediaItems.length === 0;
 
   // Reset state when closed
@@ -85,6 +86,68 @@ const GalleryViewer = ({ isOpen, onClose }) => {
       setPwd('');
       setTimeout(() => setShake(false), 500);
     }
+  };
+
+  const fetchHiddenMedia = async () => {
+    try {
+      const res = await fetch('/api/hidden-media');
+      if (res.ok) {
+        const list = await res.json();
+        setHiddenMedia(list);
+        try {
+          localStorage.setItem('hidden_media_backup', JSON.stringify(list));
+        } catch {}
+      }
+    } catch (err) {
+      console.warn('Could not fetch hidden media, loading backup:', err);
+      try {
+        const backup = localStorage.getItem('hidden_media_backup');
+        if (backup) setHiddenMedia(JSON.parse(backup));
+      } catch {}
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchHiddenMedia();
+    }
+  }, [isOpen]);
+
+  const handleDeleteMedia = async (src) => {
+    if (!window.confirm("Are you sure you want to hide/delete this photo/video for everyone?")) return;
+
+    // Optimistically hide locally
+    setHiddenMedia(prev => [...prev, src]);
+
+    try {
+      const res = await fetch('/api/hidden-media', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ src })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setHiddenMedia(data.list);
+        try {
+          localStorage.setItem('hidden_media_backup', JSON.stringify(data.list));
+        } catch {}
+      } else {
+        throw new Error('Failed to update hidden list on server');
+      }
+    } catch (err) {
+      console.error('Error hiding media:', err);
+      try {
+        const backup = localStorage.getItem('hidden_media_backup');
+        const list = backup ? JSON.parse(backup) : [];
+        if (!list.includes(src)) {
+          list.push(src);
+          localStorage.setItem('hidden_media_backup', JSON.stringify(list));
+        }
+      } catch {}
+    }
+
+    setLightboxIdx(null);
   };
 
   const genderConfig = {
@@ -376,6 +439,18 @@ const GalleryViewer = ({ isOpen, onClose }) => {
                             className="relative rounded-xl overflow-hidden aspect-square"
                             style={{ border: `1px solid ${genderConfig[gender].color}25` }}
                           >
+                             {adminMode && (
+                               <button
+                                 onClick={(e) => {
+                                   e.stopPropagation();
+                                   handleDeleteMedia(item.src);
+                                 }}
+                                 className="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-red-600/90 hover:bg-red-500 hover:scale-110 active:scale-95 transition-all text-white font-bold flex items-center justify-center text-[10px] shadow-lg"
+                                 title="Delete photo/video"
+                               >
+                                 ✕
+                               </button>
+                             )}
                             {mediaType === 'videos' ? (
                               <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                                 <video src={item.src} className="w-full h-full object-cover opacity-80" preload="metadata" />
@@ -442,6 +517,16 @@ const GalleryViewer = ({ isOpen, onClose }) => {
                         className="px-5 py-2 rounded-full text-sm font-semibold disabled:opacity-30 text-white"
                         style={{ background: 'rgba(139,92,246,0.2)', border: '1px solid rgba(139,92,246,0.35)' }}
                       >← Prev</motion.button>
+                      {adminMode && (
+                        <motion.button
+                          whileHover={{ scale: 1.08 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleDeleteMedia(mediaItems[lightboxIdx].src)}
+                          className="px-5 py-2 rounded-full text-sm font-bold text-white bg-red-600/90 hover:bg-red-500 border border-red-500/30 shadow-lg shadow-red-600/20"
+                        >
+                          🗑️ Hide Media
+                        </motion.button>
+                      )}
                       <motion.button
                         disabled={lightboxIdx === mediaItems.length - 1}
                         whileHover={{ scale: 1.08 }}

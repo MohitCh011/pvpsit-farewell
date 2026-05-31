@@ -11,6 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const DATA_FILE = path.join(__dirname, 'students.json');
 const MESSAGES_FILE = path.join(__dirname, 'messages.json');
+const HIDDEN_MEDIA_FILE = path.join(__dirname, 'hidden_media.json');
 
 app.use(cors());
 app.use(express.json());
@@ -55,6 +56,28 @@ async function writeMessagesData(data) {
     return true;
   } catch (error) {
     console.error('Error writing to messages database file:', error);
+    return false;
+  }
+}
+
+// Helper function to read hidden media
+async function readHiddenMedia() {
+  try {
+    const data = await fs.readFile(HIDDEN_MEDIA_FILE, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Error reading hidden media file:', error);
+    return [];
+  }
+}
+
+// Helper function to write hidden media
+async function writeHiddenMedia(data) {
+  try {
+    await fs.writeFile(HIDDEN_MEDIA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    return true;
+  } catch (error) {
+    console.error('Error writing hidden media file:', error);
     return false;
   }
 }
@@ -148,6 +171,35 @@ app.delete('/api/messages/:id', async (req, res) => {
   } else {
     res.status(500).json({ error: 'Failed to delete message' });
   }
+});
+
+// ────────────────────────────────────────────────────────────────
+//  HIDDEN MEDIA ENDPOINTS
+// ────────────────────────────────────────────────────────────────
+
+// API endpoint to fetch all hidden media paths
+app.get('/api/hidden-media', async (req, res) => {
+  const list = await readHiddenMedia();
+  res.json(list);
+});
+
+// API endpoint to add a path to hidden media
+app.post('/api/hidden-media', async (req, res) => {
+  const { src } = req.body;
+  if (!src) {
+    return res.status(400).json({ error: 'src path is required' });
+  }
+
+  const list = await readHiddenMedia();
+  if (!list.includes(src)) {
+    list.push(src);
+    const success = await writeHiddenMedia(list);
+    if (!success) {
+      return res.status(500).json({ error: 'Failed to save hidden media list' });
+    }
+  }
+
+  res.status(201).json({ success: true, list });
 });
 
 // Start server

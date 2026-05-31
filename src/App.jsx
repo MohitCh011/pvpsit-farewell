@@ -16,6 +16,23 @@ function App() {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [classDetailsOpen, setClassDetailsOpen] = useState(false);
   const [videoOpen, setVideoOpen] = useState(false);
+  
+  const [adminMode, setAdminMode] = useState(() => {
+    try {
+      return localStorage.getItem('adminMode') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleEnableAdminMode = () => {
+    setAdminMode(true);
+    try {
+      localStorage.setItem('adminMode', 'true');
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <div className="relative min-h-screen" style={{ background: 'linear-gradient(135deg, #020010 0%, #0a0025 30%, #07001a 60%, #020010 100%)' }}>
@@ -82,6 +99,7 @@ function App() {
           onOpenGallery={() => setGalleryOpen(true)}
           onOpenClassDetails={() => setClassDetailsOpen(true)}
           onOpenVideo={() => setVideoOpen(true)}
+          onEnableAdminMode={handleEnableAdminMode}
         />
         <Footer />
       </main>
@@ -90,7 +108,7 @@ function App() {
       <PhotoViewer isOpen={photoOpen} onClose={() => setPhotoOpen(false)} />
 
       {/* Gallery viewer */}
-      <GalleryViewer isOpen={galleryOpen} onClose={() => setGalleryOpen(false)} />
+      <GalleryViewer isOpen={galleryOpen} onClose={() => setGalleryOpen(false)} adminMode={adminMode} />
 
       {/* Class details */}
       <ClassDetails isOpen={classDetailsOpen} onClose={() => setClassDetailsOpen(false)} />

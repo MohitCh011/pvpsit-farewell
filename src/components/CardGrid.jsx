@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 const cards = [
@@ -128,35 +129,55 @@ const Card = ({ card, index, onOpenPhoto, onOpenGallery, onOpenClassDetails, onO
   </motion.article>
 );
 
-const CardGrid = ({ onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenVideo }) => (
-  <section className="relative z-10 px-4 sm:px-8 pb-24 max-w-3xl mx-auto">
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.7 }}
-      className="text-center mb-12"
-    >
-      <h2 className="text-3xl sm:text-4xl font-bold gradient-text mb-3">Your Memory Capsule</h2>
-      <p className="text-slate-400 text-base sm:text-lg max-w-xl mx-auto">
-        Four years compressed into digital moments. Click to explore and relive them.
-      </p>
-    </motion.div>
+const CardGrid = ({ onOpenPhoto, onOpenGallery, onOpenClassDetails, onOpenVideo, onEnableAdminMode }) => {
+  const [clickCount, setClickCount] = useState(0);
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-      {cards.map((card, i) => (
-        <Card
-          key={card.id}
-          card={card}
-          index={i}
-          onOpenPhoto={onOpenPhoto}
-          onOpenGallery={onOpenGallery}
-          onOpenClassDetails={onOpenClassDetails}
-          onOpenVideo={onOpenVideo}
-        />
-      ))}
-    </div>
-  </section>
-);
+  const handleHeaderClick = () => {
+    setClickCount(prev => {
+      const next = prev + 1;
+      if (next === 20) {
+        onEnableAdminMode();
+        alert('Admin mode activated 🛠️');
+      }
+      return next;
+    });
+  };
+
+  return (
+    <section className="relative z-10 px-4 sm:px-8 pb-24 max-w-3xl mx-auto">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.7 }}
+        className="text-center mb-12"
+      >
+        <h2 
+          className="text-3xl sm:text-4xl font-bold gradient-text mb-3 cursor-default select-none"
+          onClick={handleHeaderClick}
+        >
+          Your Memory Capsule
+        </h2>
+        <p className="text-slate-400 text-base sm:text-lg max-w-xl mx-auto">
+          Four years compressed into digital moments. Click to explore and relive them.
+        </p>
+      </motion.div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+        {cards.map((card, i) => (
+          <Card
+            key={card.id}
+            card={card}
+            index={i}
+            onOpenPhoto={onOpenPhoto}
+            onOpenGallery={onOpenGallery}
+            onOpenClassDetails={onOpenClassDetails}
+            onOpenVideo={onOpenVideo}
+          />
+        ))}
+      </div>
+    </section>
+  );
+};
 
 export default CardGrid;
