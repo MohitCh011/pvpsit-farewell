@@ -424,8 +424,8 @@ export const GIRLS_PHOTOS = [
 ];
 
 // ─── PASSWORD HASHES (SHA-256) ───────────────────────────────────────────────
-// boys  original: 143  | girls original: 420
+// boys: 2k22 | girls: 143
 export const PASSWORD_HASHES = {
-  boys:  'd6f0c71ef0c88e45e4b3a2118fcb83b0def392d759c901e9d755d0e879028727',
-  girls: 'db55da3fc3098e9c42311c6013304ff36b19ef73d12ea932054b5ad51df4f49d',
+  boys:  'aeb944b0e549b8c88e9736ac92a12d3a4c4410142b8c56440e83c8714f9bc889',
+  girls: 'd6f0c71ef0c88e45e4b3a2118fcb83b0def392d759c901e9d755d0e879028727',
 };
